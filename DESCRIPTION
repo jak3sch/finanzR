@@ -1,0 +1,24 @@
+Package: finanzR
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Authors@R: c(
+    person("Jakob", "Eschler",
+           role = c("aut", "cre"),
+           email = "mail@jakob-eschler.de")
+  )
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + file LICENSE
+URL: https://gitlab.com/jakesch/finanzr
+BugReports: https://gitlab.com/jakesch/finanzr/-/issues
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports:
+  tidyverse,
+  rlang,
+  geckor,
+  vctrs (>= 0.5.2),
+  purrr (>= 1.0.1)
