@@ -1,4 +1,36 @@
-url: ~
+destsination: docs
+
+url: https://jak3sch.github.io/finanzR/
+
+reference:
+  - title: Kraken
+    contents:
+      - "kraken_staking"
+  - title: Portfolio Performance
+    contents:
+      - "pp_create_import"
+      - "pp_rename_columns"
+  - title: Helper
+    contents:
+      - "all_coins"
+      - "write_csv"
+
+navbar:
+  type: dark
+  bg: dark
+  structure:
+    left:  [home, reference, articles]
+  components:
+    articles:
+      text: "Artikel"
+      menu:
+      - text: Kraken Staking in Portfolio Performance
+        href: articles/kraken_staking.html
+
 template:
   bootstrap: 5
-
+  bootswatch: yeti
+  bslib:
+    font_scale: 1.1
+    base_font: {google: "Roboto"}
+    heading_font: {google: "Kanit"}

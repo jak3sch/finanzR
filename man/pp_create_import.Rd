@@ -2,13 +2,15 @@
 % Please edit documentation in R/pp_create_import.R
 \name{pp_create_import}
 \alias{pp_create_import}
-\title{Create import data for Portfolio Performance}
+\title{Create import file for Portfolio Performance}
 \usage{
-pp_create_import(df, type, file, lang = "de")
+pp_create_import(type, input)
 }
 \arguments{
-\item{file}{}
+\item{type}{Currently only \code{"kraken_staking"}. Performs \code{\link{kraken_staking}}, \code{\link{pp_rename_columns}} and \code{\link{write_csv}}}
+
+\item{input}{\code{String} to file path. Currently it needs to be a Kraken ledgers.csv export}
 }
 \description{
-Create import data for Portfolio Performance
+This function creates a file \code{pp_kraken_staking.csv} in the current working directory. This file can be imported in Kraken. \emph{IMPORTANT} in the import dialog you have to define the correct formatting for \code{Wert}, \code{Stueck} and \code{Gebuehr}
 }

@@ -1,17 +1,17 @@
 #' Load all supported Coins
 #'
-#' Load all supported crypto coins from the [geckor](https://github.com/next-game-solutions/geckor) package.
+#' @description Load all supported crypto coins from the CoinGecko API via the [geckor](https://github.com/next-game-solutions/geckor) package.
 #'
-#' @return A dataframe with the following columns:
-#' * `timestamp` (POSIXct);
-#' * `coin_id` (character): same as the argument `coin_id`;
-#' * `vs_currency` (character): same as the argument `vs_currency`;
-#' * `price` (double): coin price, as of `timestamp`;
-#' * `total_volume` (double): a 24 hours rolling-window trading volume, as
-#' of `timestamp`;
-#' * `market_cap` (double): market capitalisation, as of `timestamp`.
+#' @return A tibble with three columns:
+#' * `coin_id` (character): coin IDs, ordered alphabetically;
+#' * `symbol` (character): coin symbols;
+#' * `name` (character): common names of the coins;
 #'
 #' @export
+#'
+#' @examples
+#' r <- all_coins()
+#' head(r, 10)
 all_coins <- function() {
     if (exists("coins")) {
         return(coins)

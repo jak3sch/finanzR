@@ -1,6 +1,9 @@
 #' Rename columns for Portfolio Performance import
 #'
-#' @param lang (string):
+#' @description Translates tibble column names for Portfolio Performance import.
+#'
+#' @param df A `tibble.` Currently optimized for Kraken ledgers export.
+#' @param lang Currently only `"de"`.
 #'
 #' @importFrom magrittr %>%
 #'

@@ -7,8 +7,10 @@
 pp_rename_columns(df, lang = "de")
 }
 \arguments{
-\item{lang}{(string):}
+\item{df}{A \code{tibble.} Currently optimized for Kraken ledgers export.}
+
+\item{lang}{Currently only \code{"de"}.}
 }
 \description{
-Rename columns for Portfolio Performance import
+Translates tibble column names for Portfolio Performance import.
 }

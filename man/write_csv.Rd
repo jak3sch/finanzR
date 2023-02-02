@@ -7,8 +7,10 @@
 write_csv(df, output)
 }
 \arguments{
-\item{output}{}
+\item{df}{\code{data} which is stored in csv file}
+
+\item{output}{A \code{string} with the path and filename}
 }
 \description{
-Write to local csv file
+Write data to a local csv file
 }

@@ -1,22 +1,39 @@
-#' Create import file for staking from Kraken
+#' Load coin values for Kraken staking
 #'
-#' @param file (string): path to the exported ledgers.csv file from Kraken
+#' @description Adds coin values from CoinGecko API to Kraken staking transactions
 #'
-#' @return A dataframe with the following columns:
-#' * `timestamp` (POSIXct);
-#' * `coin_id` (character): same as the argument `coin_id`;
-#' * `vs_currency` (character): same as the argument `vs_currency`;
-#' * `price` (double): coin price, as of `timestamp`;
-#' * `total_volume` (double): a 24 hours rolling-window trading volume, as
-#' of `timestamp`;
-#' * `market_cap` (double): market capitalisation, as of `timestamp`.
+#' @param input A `string` with the path to the exported Kraken ledgers data or a `data.frame` with the same strucutre as the kraken ledgers export.
+#' @param base_currency A `string` with the prefered currency in which the coin value will be returned. One of `c("eur", "usd")`. If the result will be imported in Portfolio Performance, this should be the same as the base currency set there.
+#' @param input_type A `string` which defines what kind of input you are passing. If you are not passing a exported `ledgers.csv` from Kraken the data needs the columns `time`, `type`, `asset` and `amount.`
+#'
+#' @return A tibble with the following columns:
+#' * `date` (date): date of the staking transaction;
+#' * `time` (character) time of the staking transaction;
+#' * `type` (character): staking;
+#' * `asset` (character): Kraken coin abbreviation;
+#' * `amount` (double): amount of staked coins;
+#' * `fee` (double): transaction fee;
+#' * `price` (double): coin price in `base_currency`, as of `date`;
+#' * `currency` (character): currency of coin value;
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
 #' @export
-
-kraken_staking <- function(input, currency = "EUR", input_type = "file") {
+#'
+#' @examples
+#' kraken_data <- data.frame(
+#'   time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49",
+#'          "2022-04-18 09:07:51", "2022-04-19 02:46:48", "2022-04-25 09:11:56",
+#'          "2022-04-26 02:48:12"),
+#'   type = "staking",
+#'   asset = c("TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S"),
+#'   amount = c(0.4, 0.55, 10.76, 0.55, 10.77, 0.55, 10.79)
+#' )
+#'
+#' r <- kraken_staking(kraken_data, input_type = "data.frame")
+#' head(r, 10)
+kraken_staking <- function(input, base_currency = "eur", input_type = "file") {
   coins <- finanzR::all_coins()
 
   if (input_type == "file") {
@@ -42,7 +59,7 @@ kraken_staking <- function(input, currency = "EUR", input_type = "file") {
   used_coin_hinstory <- geckor::coin_history(
     coin_id = unique(input$coin_id),
     days = "max",
-    vs_currency = "eur",
+    vs_currency = base_currency,
     interval = "daily"
     ) %>%
     dplyr::mutate(date = base::as.Date(timestamp))
@@ -57,24 +74,17 @@ kraken_staking <- function(input, currency = "EUR", input_type = "file") {
         dplyr::select(.data$date, .data$coin_id, .data$price),
       by = c("date", "coin_id")
     ) %>%
-    dplyr::mutate(
-      "symbol" = paste(toupper(.data$asset), currency, sep = "/")
-    ) %>%
+    dplyr::mutate("currency" = base_currency) %>%
     dplyr::select(dplyr::any_of(c(
       "date",
       "time",
       "type",
-      "symbol",
+      "asset",
       "amount",
       "fee",
-      "price"
+      "price",
+      "currency"
     )))
 
-  dividend <- staking %>%
-    dplyr::mutate(type = "Dividende")
-
-  buy <- staking %>%
-    dplyr::mutate(type = "Kauf")
-
-  return(rbind(dividend, buy))
+  return(staking)
 }

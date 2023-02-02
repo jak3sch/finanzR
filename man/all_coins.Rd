@@ -7,21 +7,17 @@
 all_coins()
 }
 \value{
-A dataframe with the following columns:
-* `timestamp` (POSIXct);
-* `coin_id` (character): same as the argument `coin_id`;
-* `vs_currency` (character): same as the argument `vs_currency`;
-* `price` (double): coin price, as of `timestamp`;
-* `total_volume` (double): a 24 hours rolling-window trading volume, as
-of `timestamp`;
-* `market_cap` (double): market capitalisation, as of `timestamp`.
+A tibble with three columns:
+\itemize{
+\item \code{coin_id} (character): coin IDs, ordered alphabetically;
+\item \code{symbol} (character): coin symbols;
+\item \code{name} (character): common names of the coins;
+}
 }
 \description{
-Load all supported crypto coins from the [geckor](https://github.com/next-game-solutions/geckor) package.
+Load all supported crypto coins from the CoinGecko API via the \href{https://github.com/next-game-solutions/geckor}{geckor} package.
 }
 \examples{
-\donttest{
 r <- all_coins()
-print(r)
-}
+head(r, 10)
 }

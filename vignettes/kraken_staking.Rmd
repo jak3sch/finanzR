@@ -1,0 +1,90 @@
+---
+title: "Kraken Staking in Portfolio Performance"
+author: "Jakob Eschler"
+output: rmarkdown::html_vignette
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(finanzR)
+```
+
+## Einführung
+
+Diese Anleitung geht davon aus, dass du R und das Paket [`finanzR`](https://github.com/jak3sch/finanzR) installiert hast. Ich empfehle, mit RStudio zu arbeiten. Wenn du bei der Installation und/oder Einführung Hilfe benötigst, [gibt es hier eine Anleitung](https://github.com/leesharpe/nfldata/blob/master/RSTUDIO-INTRO.md#r-and-rstudio-introduction).
+
+## Setup
+
+Als erstes musst du die aus deinem Kraken Konto eine csv Datei herunterladen. Gehe dazu im Menü zu "History" -> "Export" und wähle im Dropdown Menü "Ledgers". Wenn du magst, kannst du auch noch den Zeitraum der Transaktionen einschränken. Klicke anschließend auf "Submit".
+
+Nach einer kurzen Zeit kannst du den Export mit Klick auf die drei Punkte herunterladen.
+
+Entdpacke das zip auf deinem Rechner und lege die `ledgers.csv` in dein R Working Directory.
+
+## Import Daten für Portfolio Performance erzeugen
+
+Anschließend wechselst du in RStudio und erzeugst ein neues Dokument.
+
+Die ledgers.csv ist in etwa so aufgebaut, wie diese Beispieldaten.
+
+```{r include=FALSE}
+ledgers <- data.frame(
+  time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49", 
+           "2022-04-18 09:07:51", "2022-04-19 02:46:48", "2022-04-25 09:11:56", 
+           "2022-04-26 02:48:12"), 
+  type = "staking",
+  asset = c("TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S"),
+  amount = c(0.4, 0.55, 10.76, 0.55, 10.77, 0.55, 10.79)
+)
+```
+
+
+```{r echo=TRUE}
+head(ledgers, 5)
+```
+
+Deine Datei kannst du nun mit der Funktion `pp_create_import` in eine `pp_kraken_staking.csv` umwandeln, die in dein Working Directory geschrieben wird.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+pp_create_import("ledgers.csv")
+```
+
+Diese Datei ist dann so aufgebaut:
+
+```{r include=FALSE}
+staking <- data.frame(
+  date = c("2022-04-05", "2022-04-11"), 
+  time = c("03:24:26", "17:51:44"), 
+  type = "staking",
+  asset = c("TRX.S", "ADA.S"),
+  amount = c(0.4, 0.55),
+  price = c(0.0645, 0.954),
+  currency = "eur"
+) %>%
+  dplyr::mutate("symbol" = paste(toupper(asset), toupper(currency), sep = "/")) %>%
+  dplyr::select(-type, -asset, -currency)
+
+staking <- finanzR::pp_rename_columns(staking)
+
+dividend <- staking %>%
+  dplyr::mutate(Typ = "Dividende")
+
+buy <- staking %>%
+  dplyr::mutate(Typ = "Kauf")
+```
+
+```{r echo=FALSE}
+head(staking, 5)
+```
+
+## Import to Portfolio Performance
+```{r eval=FALSE, include=FALSE, out.width='70%'}
+knitr::include_graphics("img/geometry.png")
+```
