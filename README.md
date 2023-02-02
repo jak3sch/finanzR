@@ -6,7 +6,18 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of finanzR is to …
+finanzR was developed as a personal library of scripts to facilitate
+financial tracking in [Portfolio
+Performance](https://www.portfolio-performance.info/).
+
+Since these may also help others, I have decided to publish the library.
+
+At the moment the package is in an early beta and testing phase, but
+will be extended in the future.
+
+If you have any suggestions or find any bugs, feel free to create a new
+issue. Since this is my first R package, it is possible that there will
+be changes in the architecture during the development.
 
 ## Installation
 
@@ -18,38 +29,58 @@ You can install the development version of finanzR from
 devtools::install_github("jak3sch/finanzR")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
+For more detailed information, please refer to the
+[documentation](https://jak3sch.github.io/finanzR/).
+
+### Crypto
+
+`{finanzR}` tries to solve the problem that staking cannot really be
+mapped in Portfolio Performance. Currently the function only supports
+staking at [Kraken](https://www.kraken.com/).
 
 ``` r
 library(finanzR)
-## basic example code
+
+# kraken ledgers export
+kraken_data <- data.frame(
+  time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49", 
+           "2022-04-18 09:07:51", "2022-04-19 02:46:48", "2022-04-25 09:11:56", 
+           "2022-04-26 02:48:12"), 
+  type = "staking",
+  asset = c("TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S"),
+  amount = c(0.4, 0.55, 10.76, 0.55, 10.77, 0.55, 10.79)
+)
+
+staking_data <- finanzR::kraken_staking(input = kraken_data, input_type = "data.frame")
+
+print(staking_data)
+#> # A tibble: 14 × 6
+#>    date       time     type      symbol  amount  price
+#>    <date>     <chr>    <chr>     <chr>    <dbl>  <dbl>
+#>  1 2022-04-05 03:24:26 Dividende TRX/EUR   0.4  0.0645
+#>  2 2022-04-11 17:51:44 Dividende ADA/EUR   0.55 0.954 
+#>  3 2022-04-12 02:43:49 Dividende TRX/EUR  10.8  0.0535
+#>  4 2022-04-18 09:07:51 Dividende ADA/EUR   0.55 0.856 
+#>  5 2022-04-19 02:46:48 Dividende TRX/EUR  10.8  0.0571
+#>  6 2022-04-25 09:11:56 Dividende ADA/EUR   0.55 0.820 
+#>  7 2022-04-26 02:48:12 Dividende TRX/EUR  10.8  0.0610
+#>  8 2022-04-05 03:24:26 Kauf      TRX/EUR   0.4  0.0645
+#>  9 2022-04-11 17:51:44 Kauf      ADA/EUR   0.55 0.954 
+#> 10 2022-04-12 02:43:49 Kauf      TRX/EUR  10.8  0.0535
+#> 11 2022-04-18 09:07:51 Kauf      ADA/EUR   0.55 0.856 
+#> 12 2022-04-19 02:46:48 Kauf      TRX/EUR  10.8  0.0571
+#> 13 2022-04-25 09:11:56 Kauf      ADA/EUR   0.55 0.820 
+#> 14 2022-04-26 02:48:12 Kauf      TRX/EUR  10.8  0.0610
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+The function takes the exported ledger data from Kraken. It searches the
+CoinGecko api for the price of the coin on the day of the staking
+transaction.
 
-``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
+It then creates 2 transactions each for Portfolio Performance: a
+dividend and a purchase.
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" width="100%" />
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+Since we only have the day’s price, it’s not 100% accurate, but it’s
+better than nothing.
