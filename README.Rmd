@@ -39,7 +39,7 @@ devtools::install_github("jak3sch/finanzR")
 
 For more detailed information, please refer to the [documentation](https://jak3sch.github.io/finanzR/).
 
-### Crypto
+### Crypto Staking (Kraken)
 
 `{finanzR}` tries to solve the problem that staking cannot really be mapped in Portfolio Performance. Currently the function only supports staking at [Kraken](https://www.kraken.com/).
 
