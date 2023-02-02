@@ -16,10 +16,16 @@
 #'
 #' @export
 
-kraken_staking <- function(file, currency = "EUR") {
+kraken_staking <- function(input, currency = "EUR", input_type = "file") {
   coins <- finanzR::all_coins()
 
-  input <- utils::read.csv(file) %>%
+  if (input_type == "file") {
+    input_data <- utils::read.csv(input)
+  } else {
+    input_data <- input
+  }
+
+  input <- input_data %>%
     dplyr::filter(.data$type == "staking") %>%
     dplyr::mutate(
       asset = tolower(stringr::str_replace(.data$asset, ".S", ""))
@@ -54,15 +60,15 @@ kraken_staking <- function(file, currency = "EUR") {
     dplyr::mutate(
       "symbol" = paste(toupper(.data$asset), currency, sep = "/")
     ) %>%
-    dplyr::select(
-      .data$date,
-      .data$time,
-      .data$type,
-      .data$symbol,
-      .data$amount,
-      .data$fee,
-      .data$price
-    )
+    dplyr::select(dplyr::any_of(c(
+      "date",
+      "time",
+      "type",
+      "symbol",
+      "amount",
+      "fee",
+      "price"
+    )))
 
   dividend <- staking %>%
     dplyr::mutate(type = "Dividende")
