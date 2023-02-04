@@ -11,14 +11,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```{r message=FALSE, warning=FALSE, include=FALSE}
 library(finanzR)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(geckor)
 ```
+
+
 
 ## Einführung
 
-Diese Anleitung geht davon aus, dass du R und das Paket [`finanzR`](https://github.com/jak3sch/finanzR) installiert hast. Ich empfehle, mit RStudio zu arbeiten. Wenn du bei der Installation und/oder Einführung Hilfe benötigst, [gibt es hier eine Anleitung](https://github.com/leesharpe/nfldata/blob/master/RSTUDIO-INTRO.md#r-and-rstudio-introduction).
+Diese Anleitung geht davon aus, dass du `R` und das Paket [`finanzR`](https://github.com/jak3sch/finanzR) installiert hast. Ich empfehle, mit RStudio zu arbeiten. Wenn du bei der Installation und/oder Einführung Hilfe benötigst, [gibt es hier eine Anleitung](https://github.com/leesharpe/nfldata/blob/master/RSTUDIO-INTRO.md#r-and-rstudio-introduction).
 
 ## Setup
 
@@ -56,35 +61,7 @@ Deine Datei kannst du nun mit der Funktion `pp_create_import` in eine `pp_kraken
 pp_create_import("ledgers.csv")
 ```
 
-Diese Datei ist dann so aufgebaut:
-
-```{r include=FALSE}
-staking <- data.frame(
-  date = c("2022-04-05", "2022-04-11"), 
-  time = c("03:24:26", "17:51:44"), 
-  type = "staking",
-  asset = c("TRX.S", "ADA.S"),
-  amount = c(0.4, 0.55),
-  price = c(0.0645, 0.954),
-  currency = "eur"
-) %>%
-  dplyr::mutate("symbol" = paste(toupper(asset), toupper(currency), sep = "/")) %>%
-  dplyr::select(-type, -asset, -currency)
-
-staking <- finanzR::pp_rename_columns(staking)
-
-dividend <- staking %>%
-  dplyr::mutate(Typ = "Dividende")
-
-buy <- staking %>%
-  dplyr::mutate(Typ = "Kauf")
-```
-
-```{r echo=FALSE}
-head(staking, 5)
-```
-
 ## Import to Portfolio Performance
-```{r eval=FALSE, include=FALSE, out.width='70%'}
-knitr::include_graphics("img/geometry.png")
+```{r include=FALSE, out.width='70%'}
+knitr::include_graphics("https://jak3sch.github.io/finanzR/articles/kraken_staking_1.jpg")
 ```
