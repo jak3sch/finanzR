@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/404.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/articles/index.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/articles/kraken_staking.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/authors.html</loc>
   </url>
   <url>
-    <loc>/reference/all_coins.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/index.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/reference/kraken_staking.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/reference/all_coins.html</loc>
   </url>
   <url>
-    <loc>/reference/pp_create_import.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/pp_rename_columns.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/reference/kraken_staking.html</loc>
   </url>
   <url>
-    <loc>/reference/write_csv.html</loc>
+    <loc>https://jak3sch.github.io/finanzR/reference/pp_create_import.html</loc>
+  </url>
+  <url>
+    <loc>https://jak3sch.github.io/finanzR/reference/pp_rename_columns.html</loc>
+  </url>
+  <url>
+    <loc>https://jak3sch.github.io/finanzR/reference/write_csv.html</loc>
   </url>
 </urlset>
