@@ -5,14 +5,18 @@ url: https://jak3sch.github.io/finanzR/
 reference:
   - title: Kraken
     contents:
-      - "kraken_staking"
+      - "kraken_deposit"
+      - "kraken_ledgers_prepare"
+      - "kraken_ledgers_to_pp"
   - title: Portfolio Performance
     contents:
       - "pp_create_import"
       - "pp_rename_columns"
   - title: Helper
     contents:
+      -"split_datetime"
       - "all_coins"
+      - "all_currencies"
       - "write_csv"
 
 navbar:
