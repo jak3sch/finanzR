@@ -87,5 +87,7 @@ devtools::check()
 
 devtools::install()
 
+devtools::build_site()
+
 ```
 
