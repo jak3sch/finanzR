@@ -22,7 +22,7 @@ finanzR was developed as a personal library of scripts to facilitate financial t
 
 Since these may also help others, I have decided to publish the library.
 
-At the moment the package is in an early beta and testing phase, but will be extended in the future.
+At the moment the package is in an early beta and testing phase, but may be extended in the future.
 
 If you have any suggestions or find any bugs, feel free to create a new issue. Since this is my first R package, it is possible that there will be changes in the architecture during the development.
 
@@ -66,3 +66,26 @@ The function takes the exported ledger data from Kraken. It searches the CoinGec
 It then creates 2 transactions each for Portfolio Performance: a dividend and a purchase.
 
 Since we only have the day's price, it's not 100% accurate, but it's better than nothing.
+
+
+## Development
+
+https://www.youtube.com/watch?v=EpTkT6Rkgbs&t=3947s
+
+### Create new function
+
+```{r}
+usethis::use_r("pp_rename_values")
+```
+
+
+```{r}
+devtools::document()
+devtools::load_all()
+
+devtools::check()
+
+devtools::install()
+
+```
+

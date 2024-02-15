@@ -1,6 +1,6 @@
 #' Rename columns for Portfolio Performance import
 #'
-#' @description Translates tibble column names for Portfolio Performance import.
+#' @description Translates tibble column names for Portfolio Performance import. Columns that will be renamed: `date`, `time`, `amount`, `price`, `symbol`, `type`, `fee`
 #'
 #' @param df A `tibble.` Currently optimized for Kraken ledgers export.
 #' @param lang Currently only `"de"`.
@@ -18,7 +18,8 @@ pp_rename_columns <- function(df, lang = "de") {
             "Wert" = "price",
             "Ticker-Symbol" = "symbol",
             "Typ" = "type",
-            "Gebuehr" = "fee"
+            "Gebuehr" = "fee",
+            "Buchungswaehrung" = "currency"
         )
     }
 

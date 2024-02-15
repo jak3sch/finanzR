@@ -27,7 +27,7 @@ Diese Anleitung geht davon aus, dass du `R` und das Paket [`finanzR`](https://gi
 
 ## Setup
 
-Als erstes musst du die aus deinem Kraken Konto eine csv Datei herunterladen. Gehe dazu im Menü zu "History" -> "Export" und wähle im Dropdown Menü "Ledgers". Wenn du magst, kannst du auch noch den Zeitraum der Transaktionen einschränken. Klicke anschließend auf "Submit".
+Als erstes musst du dir aus deinem Kraken Konto eine csv Datei herunterladen. Gehe dazu im Menü zu "History" -> "Export" und wähle im Dropdown Menü "Ledgers". Wenn du magst, kannst du auch noch den Zeitraum der Transaktionen einschränken. Klicke anschließend auf "Submit".
 
 Nach einer kurzen Zeit kannst du den Export mit Klick auf die drei Punkte herunterladen.
 

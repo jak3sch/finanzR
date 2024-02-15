@@ -1,4 +1,4 @@
-#' Load all supported Coins
+#' Load all supported coins
 #'
 #' @description Load all supported crypto coins. It uses the [kraken](https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken) cash-to-crypto pairs.
 #'
@@ -17,9 +17,7 @@ all_coins <- function() {
 
     kraken_cash_to_crypto_coin_symbols <- c('ZRX','1INCH','AAVE','GHST','ACA','AGLD','AKT','ALCX','ACH','ALGO','TLM','AIR','ADX','FORTH','ANKR','APE','API3','APT','ANT','ARB','ARPA','ASTR','AUDIO','REP','REPV2','AVAX','AXS','BADGER','BAL','BNT','BAND','BOND','BAT','BSX','BICO','BNC','BTC','BCH','BIT','BTT','BLUR','BLZ','BOBA','FIDA','BRICK','ADA','CTSI','CELR','CFG','XCN','LINK','CHZ','CHR','CVC','COMP','C98','CVX','ATOM','COTI','CQT','CSM','CRV','DAI','DASH','MANA','DENT','DOGE','DYDX','EWT','ENJ','MLN','EOS','ETHW','ETH','ETC','ENS','EUL','FTM','FET','FIL','FLR','FLOW','FXS','GALA','GAL','GARI','MV','GTC','GMX','GNO','GST','FARM','HFT','HDX','ICX','IDEX','RLC','IMX','INJ','TEER','INTR','ICP','JASMY','JUNO','KAR','KAVA','KEEP','KP3R','ROOK','KILT','KIN','KINT','KSM','KNC','LDO','LCX','LMWR','LSK','LTC','LPT','LRC','MNGO','MC','MXC','ALICE','MKR','MSOL','POND','MASK','MINA','MIR','XMR','GLMR','MOON','MOVR','MULTI','EGLD','NANO','NEAR','NODL','NMR','NYM','OCEAN','OMG','ORCA','OXT','OGN','OXY','PARA','PAXG','PEPE','PERP','PHA','PLA','DOT','POLS','MATIC','POWR','PSTAKE','QTUM','QNT','RARI','RAY','REN','RNDR','REQ','XRP','XRT','RPL','RBC','SBR','SAMO','SCRT','KEY','SRM','SHIB','SDN','SC','SOL','SGB','SPELL','STX','ATLAS','POLIS','STG','ALPHA','XLM','STEP','GMT','STORJ','SUI','SUSHI','RAD','FIS','SUPER','RARE','SYN','SNX','TBTC','LUNA2','LUNA','EURT','UST','TVK','USDT','XTZ','GRT','SAND','RUNE','T','TOKE','TRX','TRU','TUSD','UNFI','UNI','UMA','USDC','WAVES','WOO','WBTC','WAXL','YFI','YGG','ZEC')
 
-    kraken_cash_to_crypto_coin_currencies <-c('USD', 'EUR', 'CAD', 'JPY', 'GBP', 'CHF', 'AUD')
-
-    kraken_cash_to_crypto_pairs <- tibble::tibble(kraken_cash_to_crypto_coin_names, kraken_cash_to_crypto_coin_symbols, .name_repair = ~ c("name", "symbol")) %>%
+    coins <- tibble::tibble(kraken_cash_to_crypto_coin_names, kraken_cash_to_crypto_coin_symbols, .name_repair = ~ c("name", "symbol")) %>%
         dplyr::mutate(
             symbol = tolower(symbol),
             name = stringr::str_replace_all(name, "\\(.*?\\)|\\*\\*?", ""), # remove everything inside (), all * and **
@@ -112,5 +110,5 @@ all_coins <- function() {
     #    group_by(symbol) %>%
     #    dplyr::mutate(count = n())
 
-    return(kraken_cash_to_crypto_pairs)
+    return(coins)
 }

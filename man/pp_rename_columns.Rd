@@ -12,5 +12,5 @@ pp_rename_columns(df, lang = "de")
 \item{lang}{Currently only \code{"de"}.}
 }
 \description{
-Translates tibble column names for Portfolio Performance import.
+Translates tibble column names for Portfolio Performance import. Columns that will be renamed: \code{date}, \code{time}, \code{amount}, \code{price}, \code{symbol}, \code{type}, \code{fee}
 }

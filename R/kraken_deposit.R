@@ -1,4 +1,4 @@
-#' Load coin values for Kraken staking
+#' fdgfdgf
 #'
 #' @description Adds coin values from CoinGecko API to Kraken staking transactions
 #'
@@ -31,11 +31,10 @@
 #'   amount = c(0.4, 0.55, 10.76, 0.55, 10.77, 0.55, 10.79)
 #' )
 #'
-#' r <- kraken_staking(kraken_data, input_type = "data.frame")
+#' r <- kraken_deposit(kraken_data, input_type = "data.frame")
 #' head(r, 10)
-kraken_staking <- function(input, base_currency = "eur", input_type = "file") {
-  coins <- finanzR::all_coins()
 
+kraken_deposit <- function(input, base_currency = "eur", input_type = "file", lang = "de") {
   if (input_type == "file") {
     input_data <- utils::read.csv(input)
   } else {
@@ -43,48 +42,36 @@ kraken_staking <- function(input, base_currency = "eur", input_type = "file") {
   }
 
   input <- input_data %>%
-    dplyr::filter(.data$type == "staking") %>%
+    dplyr::filter(deposit == TRUE) %>%
+
+    # check, if group elemnts have the same asset
+    dplyr::group_by(refid) %>%
     dplyr::mutate(
-      asset = tolower(stringr::str_replace(.data$asset, ".S", ""))
+      same_asset = asset == dplyr::lag(asset) # add col for currency transactions, which have two different deposits
     ) %>%
-    dplyr::left_join(
-      coins,
-      dplyr::select(.data$coin_id, .data$symbol),
-      by = c("asset" = "symbol")
+    dplyr::ungroup() %>%
+
+    # filter necessary rows
+    dplyr::filter(
+      !is.na(currency) & same_asset == TRUE # filter one row from currency transactions
     ) %>%
-    dplyr::group_by(.data$time, .data$asset) %>%
-    dplyr::filter(dplyr::row_number() == 1) %>%
-    dplyr::ungroup()
 
-  #used_coin_hinstory <- geckor::coin_history(
-  #  coin_id = unique(input$coin_id),
-  #  days = "max",
-  #  vs_currency = base_currency,
-  #  interval = "daily"
-  #  ) %>%
-  #  dplyr::mutate(date = base::as.Date(timestamp))
+    # cleanup
+    dplyr::mutate(
+      asset = ifelse(is.na(currency), asset, NA),
+      price = ifelse(!is.na(currency), amount, NA)
+    ) %>%
+    dplyr::select(date, time, type, asset, amount, price, fee, currency)
 
-  #staking <- input %>%
-  #  dplyr::mutate(time = stringr::str_split(.data$time, " ")) %>%
-  #  tidyr::unnest_wider(.data$time, "") %>%
-  #  dplyr::rename("time" = "time2") %>%
-  #  dplyr::mutate(date = as.Date(.data$time1)) %>%
-  #  dplyr::left_join(
-  #    used_coin_hinstory %>%
-  #      dplyr::select(.data$date, .data$coin_id, .data$price),
-  #    by = c("date", "coin_id")
-  #  ) %>%
-  #  dplyr::mutate("currency" = base_currency) %>%
-  #  dplyr::select(dplyr::any_of(c(
-  #    "date",
-  #    "time",
-  #    "type",
-  #    "asset",
-  #    "amount",
-  #    "fee",
-  #    "price",
-  #    "currency"
-  #  )))
+  if(lang == "de") {
+    output <- input %>%
+      dplyr::mutate(
+        type = dplyr::case_when(
+          type == "deposit" & !is.na(currency) ~ "Einlage",
+          TRUE ~ type
+        )
+      )
+  }
 
-  return(input)
+  return(output)
 }

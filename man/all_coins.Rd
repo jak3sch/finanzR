@@ -2,7 +2,7 @@
 % Please edit documentation in R/all_coins.R
 \name{all_coins}
 \alias{all_coins}
-\title{Load all supported Coins}
+\title{Load all supported coins}
 \usage{
 all_coins()
 }
@@ -15,7 +15,7 @@ A tibble with three columns:
 }
 }
 \description{
-Load all supported crypto coins from the CoinGecko API via the \href{https://github.com/next-game-solutions/geckor}{geckor} package.
+Load all supported crypto coins. It uses the \href{https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken}{kraken} cash-to-crypto pairs.
 }
 \examples{
 r <- all_coins()
