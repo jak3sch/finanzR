@@ -1,11 +1,14 @@
 #' Load all supported currencies
 #'
-#' @description Load all supported currencies. It uses the [kraken](https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken) cash-to-crypto pairs.
+#' @description Load all supported currencies. It uses the [crypto2 fiat_list()](https://sstoeckl.github.io/crypto2/reference/crypto_list.html) as source
+#'
+#' @param filer A `string` to filter currencies for a specific provider (currently only `"kraken"`).
 #'
 #' @return Returns a tibble with the following columns:
-#' * `symbol` (character): currency symbol (e.g. USD, EUR...)
 #' * `name` (character): currency name
-#' * `currency_id` (character): currency id to sync with kraken assets (e.g. ZEUR)
+#' * `sign` (character): currency special character
+#' * `symbol` (character): international currency symbol (e.g. USD, EUR...)
+#' * `kraken_asset` (character): sync helper for kraken ledger transaction
 #'
 #' @importFrom magrittr %>%
 #'
@@ -15,12 +18,17 @@
 #' r <- all_currencies()
 #' r
 
-all_currencies <- function() {
-  kraken_cash_to_crypto_coin_currencies <-c("USD", "EUR", "CAD", "JPY", "GBP", "CHF", "AUD")
-  currency_names <- c("US Dollar", "Euro", "Canadian Dollar", "Yen", "Pound Sterling", "Swiss franc", "Australian Dollar")
+all_currencies <- function(filter = "") {
+  currencies <- crypto2::fiat_list(include_metals = FALSE) %>%
+    dplyr::select(-id) %>%
+    dplyr::mutate(kraken_asset = paste0("Z", symbol))
 
-  currencies <- tibble::tibble(kraken_cash_to_crypto_coin_currencies, currency_names, .name_repair = ~ c("symbol", "name")) %>%
-    dplyr::mutate(currency_id = paste0("Z", symbol))
+  if(filter == "kraken") {
+    kraken_cash_to_crypto_coin_currencies <-c("USD", "EUR", "CAD", "JPY", "GBP", "CHF", "AUD")
+
+    currencies <- currencies %>%
+      dplyr::filter(symbol %in% kraken_cash_to_crypto_coin_currencies)
+  }
 
   return(currencies)
 }
