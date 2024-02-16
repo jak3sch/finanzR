@@ -4,8 +4,8 @@
 #'
 #' @param input A `data.frame`
 #' @param target A colname `` where the value should be split.
-#' @param sep A `string` on which the value should be split (default = `" "`)
-#' @param colnames A `list` with the new colnames.
+#' @param sep A `string` on which the value should be split (default = `" "`).
+#' @param colnames A `list` with the new colnames. The `target` colname should not be included in this parameter.
 #'
 #' @return Returns the input data with new columns named by the `colnames` parameter
 #'
@@ -15,19 +15,26 @@
 #'
 #' @examples
 #' data <- data.frame(
-#'   time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49",
+#'   timestamp = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49",
 #'          "2022-04-18 09:07:51", "2022-04-19 02:46:48")
 #' )
 #'
-#' r <- split_col_value(input = data, target = time, colnames = c("date", "time"))
+#' r <- split_col_value(input = data, target = timestamp, colnames = c("date", "time"))
 #' r
 
 split_col_value <- function(input, target, sep = " ", colnames) {
-  output <- input %>%
+
+  original_input <- input
+
+  # only select the target col and split it
+  split_input <- original_input %>%
+    dplyr::select({{target}}) %>%
     dplyr::mutate(time = stringr::str_split({{target}}, {{sep}})) %>%
     tidyr::unnest_wider({{target}}, "")
 
-  colnames(output) <- colnames
+  colnames(split_input) <- colnames # change colnames
+
+  output <- dplyr::bind_cols(original_input, split_input)
 
   return(output)
 }
