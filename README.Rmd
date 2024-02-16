@@ -91,3 +91,6 @@ devtools::build_site()
 
 ```
 
+### Update documentation
+
+### Generate readme.md
