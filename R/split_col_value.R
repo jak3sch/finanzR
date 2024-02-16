@@ -29,8 +29,9 @@ split_col_value <- function(input, target, sep = " ", colnames) {
   # only select the target col and split it
   split_input <- original_input %>%
     dplyr::select({{target}}) %>%
-    dplyr::mutate(time = stringr::str_split({{target}}, {{sep}})) %>%
-    tidyr::unnest_wider({{target}}, "")
+    dplyr::mutate(split = stringr::str_split({{target}}, {{sep}})) %>%
+    tidyr::unnest_wider(split, "") %>%
+    dplyr::select(-{{target}})
 
   colnames(split_input) <- colnames # change colnames
 
