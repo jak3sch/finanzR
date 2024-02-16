@@ -3,9 +3,9 @@
 #' @description Load all supported currencies. It uses the [kraken](https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken) cash-to-crypto pairs.
 #'
 #' @return Returns a tibble with the following columns:
-#' * `symbol` (character): currency symbol (e.g. USD, EUR...);
-#' * `name` (character): currency name;
-#' *`currency_id` (character): currency id to sync with kraken assets (e.g. ZEUR)
+#' * `symbol` (character): currency symbol (e.g. USD, EUR...)
+#' * `name` (character): currency name
+#' * `currency_id` (character): currency id to sync with kraken assets (e.g. ZEUR)
 #'
 #' @importFrom magrittr %>%
 #'
