@@ -4,14 +4,12 @@
 \alias{kraken_deposit}
 \title{fdgfdgf}
 \usage{
-kraken_deposit(input, base_currency = "eur", input_type = "file", lang = "de")
+kraken_deposit(input, base_currency = "eur", lang = "de")
 }
 \arguments{
 \item{input}{A \code{string} with the path to the exported Kraken ledgers data or a \code{data.frame} with the same strucutre as the kraken ledgers export.}
 
 \item{base_currency}{A \code{string} with the prefered currency in which the coin value will be returned. One of \code{c("eur", "usd")}. If the result will be imported in Portfolio Performance, this should be the same as the base currency set there.}
-
-\item{input_type}{A \code{string} which defines what kind of input you are passing. If you are not passing a exported \code{ledgers.csv} from Kraken the data needs the columns \code{time}, \code{type}, \code{asset} and \code{amount.}}
 }
 \value{
 A tibble with the following columns:
@@ -30,15 +28,13 @@ A tibble with the following columns:
 Adds coin values from CoinGecko API to Kraken staking transactions
 }
 \examples{
-kraken_data <- data.frame(
-  time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49",
-         "2022-04-18 09:07:51", "2022-04-19 02:46:48", "2022-04-25 09:11:56",
-         "2022-04-26 02:48:12"),
-  type = "staking",
-  asset = c("TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S", "ADA.S", "TRX.S"),
-  amount = c(0.4, 0.55, 10.76, 0.55, 10.77, 0.55, 10.79)
+ledgers <- tibble::tibble(
+  refid = 1:5,
+  time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49", "2022-04-18 09:07:51", "2022-04-19 02:46:48"),
+  type = "deposit",
+  asset = "ZEUR"
 )
 
-r <- kraken_deposit(kraken_data, input_type = "data.frame")
-head(r, 10)
+r <- kraken_deposit(ledgers, input_type = "data")
+head(r, 5)
 }

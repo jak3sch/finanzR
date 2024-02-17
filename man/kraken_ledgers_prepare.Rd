@@ -10,16 +10,15 @@ kraken_ledgers_prepare(input)
 \item{input}{A \code{string} with the path to the exported Kraken ledgers data or a \code{data.frame}. If you are not passing an exported \code{ledgers.csv} from Kraken, the data needs the columns:
 \itemize{
 \item \code{refid}: a unique id for each transaction
+\item \code{time}: date and time in the format "Date Time". \url{split_col_value} is performed on this column.
 \item \code{type}: the type of the transaction (e.g. deposit, withdrawal, trade...)
-\item \code{time}: date and time in the format YYYY-MM-DD HH:MM:SS
+\item \code{asset}: the asset of the transaction
+\item \code{amount}: amount of asset in transaction
 }}
 }
 \value{
 Returns the input data with additional columns:
 \itemize{
-\item \code{date} (date): date of the staking transaction;
-\item \code{time} (character): time of the staking transaction;
-\item \code{symbol} (character): the symbol of the used asset
 \item \code{currency} (character): currency transactions getting a new column with the used currency
 \item \code{deposit} (true/false): transaction indicator
 \item \code{dividend} (true/false): transaction indicator
@@ -29,12 +28,25 @@ Returns the input data with additional columns:
 \item \code{trade} (true/false): transaction indicator
 \item \code{transfer} (true/false): transaction indicator
 \item \code{withdrawal} (true/false): transaction indicator
+\item \code{date} (character): date of the staking transaction
+\item \code{time} (character): time of the staking transaction
+\item \code{note} (character): a note with a summary of the original transaction (amount, asset, type, timestamp, refid)
+\item \code{symbol} (character): a cleaned up version of the asset column
+\item \code{coin_id} (character): the coin_id joined from \url{all_coins()}
 }
 }
 \description{
 Runs basic data manipulation and normalisation to an exported ledgers.csv from kraken.com.
 }
 \examples{
-r <- kraken_ledgers_prepare()
-head(r, 10)
+ledgers <- tibble::tibble(
+  refid = 1:5,
+  time = c("2022-04-05 03:24:26", "2022-04-11 17:51:44", "2022-04-12 02:43:49", "2022-04-18 09:07:51", "2022-04-19 02:46:48"),
+  type = "deposit",
+  asset = "ZEUR",
+  amount = c("1000", "200", "350", "4000", "100")
+)
+
+r <- kraken_ledgers_prepare(ledgers)
+r
 }

@@ -33,6 +33,7 @@
 #'
 #' r <- kraken_staking(kraken_data, input_type = "data.frame")
 #' head(r, 10)
+
 kraken_staking <- function(input, base_currency = "eur", input_type = "file") {
   coins <- finanzR::all_coins()
 

@@ -4,13 +4,22 @@
 \alias{all_currencies}
 \title{Load all supported currencies}
 \usage{
-all_currencies()
+all_currencies(filter = "")
+}
+\arguments{
+\item{filer}{A \code{string} to filter currencies for a specific provider (currently only \code{"kraken"}).}
 }
 \value{
-A character string with all currency IDs
+Returns a tibble with the following columns:
+\itemize{
+\item \code{name} (character): currency name
+\item \code{sign} (character): currency special character
+\item \code{symbol} (character): international currency symbol (e.g. USD, EUR...)
+\item \code{kraken_asset} (character): sync helper for kraken ledger transaction
+}
 }
 \description{
-Load all supported currencies. It uses the \href{https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken}{kraken} cash-to-crypto pairs.
+Load all supported currencies. It uses the \href{https://sstoeckl.github.io/crypto2/reference/crypto_list.html}{crypto2 fiat_list()} as source
 }
 \examples{
 r <- all_currencies()

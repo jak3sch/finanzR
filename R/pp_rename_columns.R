@@ -14,12 +14,13 @@ pp_rename_columns <- function(df, lang = "de") {
         col_names <- c(
             "Datum" = "date",
             "Zeit" = "time",
+            "Typ" = "type",
+            "Ticker-Symbol" = "symbol",
             "Stueck" = "amount",
             "Wert" = "price",
-            "Ticker-Symbol" = "symbol",
-            "Typ" = "type",
             "Gebuehr" = "fee",
-            "Buchungswaehrung" = "currency"
+            "Buchungswaehrung" = "currency",
+            "Notiz" = "note"
         )
     }
 

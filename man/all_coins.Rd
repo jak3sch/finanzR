@@ -9,9 +9,9 @@ all_coins()
 \value{
 A tibble with three columns:
 \itemize{
-\item \code{coin_id} (character): coin IDs, ordered alphabetically;
-\item \code{symbol} (character): coin symbols;
-\item \code{name} (character): common names of the coins;
+\item \code{coin_id} (character): coin IDs
+\item \code{symbol} (character): coin symbols
+\item \code{name} (character): common names of the coins
 }
 }
 \description{
@@ -19,5 +19,5 @@ Load all supported crypto coins. It uses the \href{https://support.kraken.com/hc
 }
 \examples{
 r <- all_coins()
-head(r, 10)
+head(r, 5)
 }
