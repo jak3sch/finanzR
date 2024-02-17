@@ -1,22 +1,11 @@
 ledgers <- read.csv("ledgers.csv")
 
+finanzR::kraken_ledgers_to_pp("ledgers.csv", base_currency = "eur")
+
 base_currency <- "eur"
-
-coins <- finanzR::all_coins()
-
 
 crypto_list <- crypto2::crypto_list(only_active = FALSE)
 fiat_list <- crypto2::fiat_list(include_metals = FALSE)
-
-
-
-
-coins <- crypto2::crypto_list(only_active = FALSE) %>%
-  dplyr::select(name, symbol, slug)
-
-
-
-
 
 
 # staking

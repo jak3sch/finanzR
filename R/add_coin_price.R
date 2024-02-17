@@ -40,6 +40,7 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
 
   # get all used coins in input_data
   used_coins <- input_data %>%
+    dplyr::filter(is.na(price)) %>% # filter all entries that already have prices
     dplyr::select(symbol) %>%
     dplyr::distinct() %>%
     dplyr::left_join(
@@ -61,6 +62,10 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
     dplyr::filter(dplyr::row_number() == 1) %>%
     dplyr::mutate(date = stringr::str_remove_all(date, "-")) %>%
     dplyr::pull(date)
+
+  if (start_date == end_date) {
+    start_date <- as.character(as.numeric(start_date) - 1)
+  }
 
   # get coin history for all used coins between start end end date
   used_coins_history <- crypto2::crypto_history(
@@ -103,13 +108,14 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
         (diff_open <= diff_close & diff_high > diff_low) ~ open_low, # transaction closer to open and low
         (diff_open > diff_close & diff_high <= diff_low) ~ close_high, # transaction closer to close and high
         (diff_open > diff_close & diff_high > diff_low) ~ close_low # transaction closer to close and low
-      )
+      ),
+      price = dplyr::case_when(
+        is.na(price) & !is.na(price_per_unit) ~ price_per_unit * amount, # if entry has no price but a price per unit calculate the new prise
+        is.na(price) & currency == TRUE ~ amount, # if entry has no price but is currency (e.g. deposit) use amount as price
+        TRUE ~ price
+      ),
     ) %>%
-    dplyr::select(-dplyr::ends_with("open"), -dplyr::ends_with("close"), -dplyr::ends_with("high"), -dplyr::ends_with("low"))
+    dplyr::select(-dplyr::ends_with("open"), -dplyr::ends_with("close"), -dplyr::ends_with("high"), -dplyr::ends_with("low"), -price_per_unit)
 
   return(output)
-
-
-
-
 }

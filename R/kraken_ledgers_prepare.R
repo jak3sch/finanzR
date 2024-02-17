@@ -96,15 +96,49 @@ kraken_ledgers_prepare <- function(input) {
     ) %>%
     dplyr::ungroup() %>%
 
-    # add geckor asset id by symbol
-    #dplyr::left_join(
-    #  finanzR::all_coins() %>%
-    #    dplyr::select(-name),
-    #  by = "symbol"
-    #) %>%
-
     # create separate columns for date and time
-    finanzR::split_col_value(target = timestamp, colnames = c("date", "time"))
+    finanzR::split_col_value(target = timestamp, colnames = c("date", "time")) %>%
+
+    # handle multiple entries per transaction
+    dplyr::group_by(refid) %>%
+    dplyr::arrange(type, currency) %>% # create same oder in each group (currency necessary for trades)
+    dplyr::mutate(
+      type = dplyr::case_when(
+        type == "withdrawal" & staking == FALSE & is.na(balance) ~ "fee", # use second entry from withdrawal for fee
+        TRUE ~ type
+      ),
+      price = dplyr::case_when(
+        # combine separate spend/receive entries
+        type == "receive" & currency == FALSE ~ dplyr::lead(amount), # combine entries from coin buys
+        type == "spend" & currency == FALSE ~ dplyr::lag(amount), # combine entries from coin sells
+
+        # withdrawal
+        type == "withdrawal" & currency == TRUE ~ amount,
+
+        # trades
+        type == "trade" & staking == FALSE & currency == FALSE ~ dplyr::lead(amount),
+
+        # fees
+        type == "fee" ~ fee
+      ),
+      fee = dplyr::case_when(
+        type == "spend" & currency == FALSE ~ dplyr::lag(fee), # get fee from coin selling  transaction
+        TRUE ~ fee
+      )
+    ) %>%
+    dplyr::filter(
+      currency == FALSE | # all coin transactions
+        !(currency == TRUE & type == "deposit" & is.na(balance)), # remove duplicates from currency deposits
+      !(type == "spend" & currency == TRUE & is.na(price)), # remove spend transactions from coin buys
+      !(type == "receive" & currency == TRUE & is.na(price)), # remove receive transaction from coin sells
+      !(type == "trade" & staking == FALSE & currency == TRUE), # remove duplicates from coin trades
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(timestamp) %>%
+    dplyr::mutate(
+      amount = ifelse(amount < 0, amount * -1, amount),
+      price = ifelse(price < 0, price * -1, price),
+    )
 
   return(output)
 }

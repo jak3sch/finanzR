@@ -29,7 +29,7 @@ split_col_value <- function(input, target, sep = " ", colnames) {
   # only select the target col and split it
   split_input <- original_input %>%
     dplyr::select({{target}}) %>%
-    dplyr::mutate(split = stringr::str_split({{target}}, {{sep}})) %>%
+    dplyr::mutate(split = stringr::str_split(as.character({{target}}), {{sep}})) %>%
     tidyr::unnest_wider(split, "") %>%
     dplyr::select(-{{target}})
 
