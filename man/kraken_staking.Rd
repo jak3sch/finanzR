@@ -4,7 +4,7 @@
 \alias{kraken_staking}
 \title{Load coin values for Kraken staking}
 \usage{
-kraken_staking(input, base_currency = "eur", input_type = "file")
+kraken_staking(input, prepared = FALSE, base_currency = "eur")
 }
 \arguments{
 \item{input}{A \code{string} with the path to the exported Kraken ledgers data or a \code{data.frame} with the same strucutre as the kraken ledgers export.}

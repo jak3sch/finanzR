@@ -4,7 +4,7 @@
 \alias{kraken_ledgers_to_pp}
 \title{Load all supported currencies}
 \usage{
-kraken_ledgers_to_pp(input, base_currency = "eur", lang = "de")
+kraken_ledgers_to_pp(input, base_currency = "eur", lang = "de", filter = FALSE)
 }
 \value{
 A character string with all currency IDs

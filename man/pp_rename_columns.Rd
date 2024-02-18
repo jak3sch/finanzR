@@ -4,12 +4,12 @@
 \alias{pp_rename_columns}
 \title{Rename columns for Portfolio Performance import}
 \usage{
-pp_rename_columns(df, lang = "de")
+pp_rename_columns(input, lang = "de")
 }
 \arguments{
-\item{df}{A \code{tibble.} Currently optimized for Kraken ledgers export.}
-
 \item{lang}{Currently only \code{"de"}.}
+
+\item{df}{A \code{tibble.} Currently optimized for Kraken ledgers export.}
 }
 \description{
 Translates tibble column names for Portfolio Performance import. Columns that will be renamed: \code{date}, \code{time}, \code{amount}, \code{price}, \code{symbol}, \code{type}, \code{fee}

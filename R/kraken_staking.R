@@ -34,28 +34,102 @@
 #' r <- kraken_staking(kraken_data, input_type = "data.frame")
 #' head(r, 10)
 
-kraken_staking <- function(input, base_currency = "eur", input_type = "file") {
-  coins <- finanzR::all_coins()
+kraken_staking <- function(input, prepared = FALSE, base_currency = "eur") {
+  cli::cli_inform(c(i = "create staking data"))
 
-  if (input_type == "file") {
-    input_data <- utils::read.csv(input)
-  } else {
+  if (prepared == TRUE) {
     input_data <- input
+  } else {
+    message("prepare data")
+    prepare <- finanzR::kraken_ledgers_prepare(input = input)
+    all_coins <- crypto2::crypto_list(only_active = FALSE)
+    input_data <- finanzR::add_coin_price(input = prepare, coins = all_coins, base_currency = {{base_currency}})
   }
 
-  input <- input_data %>%
-    dplyr::filter(.data$type == "staking") %>%
+  staking <- input_data %>%
+    dplyr::filter(staking == TRUE | staking_start == TRUE | staking_end == TRUE)
+
+  # 1. coin to staking
+  ## 1. withdrawal coin -> sell coin main account
+  ## 2. transfer "spottostaking" -> transfer from main to staking account
+  ## 3. deposit coin.S -> buy coin staking account
+  ## 4. transfer "stakingfromspot" -> transfer from main to staking account
+
+  # 2. staking
+
+  # 3. staking to coin
+  ## 1. withdrawal coin.S -> sell coin staking account
+  ## 2. transfer "stakingtospot" -> transfer from staking to main account
+  ## 3. deposit coin -> buy coin main account
+  ## 4. transfer "spotfromstaking" -> transfer from staking to main account
+
+  main_account_transactions <- staking %>%
+    dplyr::filter(
+      staking_start == TRUE & staking == FALSE |
+        staking_end == TRUE & staking == FALSE,
+      !(type == "transfer" & staking_end == TRUE) # remove transfer coin (#3. ## 4.) because pp has the option to select an offset account on import
+    ) %>%
+    finanzR::kraken_rename_values() %>%
     dplyr::mutate(
-      asset = tolower(stringr::str_replace(.data$asset, ".S", ""))
+      symbol = ifelse(
+        subtype == "spottostaking" & staking_start == TRUE & staking == FALSE,
+        toupper({{base_currency}}),
+        symbol
+      )
+    )
+
+  staking_account_transactions <- staking %>%
+    dplyr::filter(
+      !(staking_start == TRUE & staking == FALSE),
+      !(type == "transfer" & staking_start == TRUE) # remove deposit coin.S (## 3.) because pp has the option to select an offset account on import
     ) %>%
-    dplyr::left_join(
-      coins,
-      dplyr::select(.data$coin_id, .data$symbol),
-      by = c("asset" = "symbol")
+    dplyr::mutate(
+      type = dplyr::case_when(
+        type == "staking" & transfer == FALSE ~ "dividend",
+        TRUE ~ type
+      ),
     ) %>%
-    dplyr::group_by(.data$time, .data$asset) %>%
-    dplyr::filter(dplyr::row_number() == 1) %>%
-    dplyr::ungroup()
+    finanzR::kraken_rename_values() %>%
+    finanzR::pp_rename_columns()
+
+  write.table(staking_account_transactions, "pp_import_kraken_staking_account.csv", sep = ";", row.names = FALSE, na = "")
+
+  # return df if prepared == TRUE, else write csv
+  if (prepared == TRUE) {
+    return(main_account_transactions)
+  } else {
+    output <- main_account_transactions %>%
+      finanzR::pp_rename_columns()
+
+    write.table(output, "pp_import_kraken_main_account.csv", sep = ";", row.names = FALSE, na = "")
+  }
+
+    # type == "deposit" & staking == TRUE & transfer == TRUE # sell coins fro staking
+    # type == "transfer" & staking == TRUE & transfer == TRUE # umbuchung zu anderem konto
+
+    # handle multiple entries per transaction
+    #dplyr::mutate(
+
+    #)
+    #dplyr::filter(
+    #  !(type == "deposit" & staking == TRUE & transfer == FALSE & is.na(balance)), # remove all staking deposits that are no transfer with no balance
+    #) %>%
+
+    #dplyr::mutate(
+    #  type = dplyr::case_when(
+    #    type == "staking" & transfer == FALSE ~ "dividend",
+    #    type == "" & transfer == TRUE ~ "sell",
+    #    TRUE ~ type
+    #  ),
+    #  price_new = dplyr::case_when(
+    #    type == "transfer" & staking == TRUE ~ price / amount,
+    #    TRUE ~ price
+    #  ),
+    #  note = ifelse(staking == TRUE, paste("Staking:", note), note) subtype
+    #) %>%
+
+    #dplyr::filter(!(type %in% c("dividend", "withdrawal")))
+
 
   #used_coin_hinstory <- geckor::coin_history(
   #  coin_id = unique(input$coin_id),
@@ -86,6 +160,4 @@ kraken_staking <- function(input, base_currency = "eur", input_type = "file") {
   #    "price",
   #    "currency"
   #  )))
-
-  return(input)
 }

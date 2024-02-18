@@ -42,6 +42,8 @@
 #' r
 
 kraken_ledgers_prepare <- function(input) {
+  cli::cli_inform(c(i = "prepare data"))
+
   if (is.character(input)) {
     input_data <- utils::read.csv(input)
   } else {
@@ -60,7 +62,7 @@ kraken_ledgers_prepare <- function(input) {
       by = c("asset" = "kraken_asset")
     ) %>%
 
-    #fix kraken naming conventions (leading X for old crypto currencies)
+    # fix kraken naming conventions (leading X for old crypto currencies)
     dplyr::mutate(
       symbol = dplyr::case_when(
         !asset %in% c("XCN", "XRT", "XTZ") ~ stringr::str_replace(asset, "^X", ""), # remove leading X from coins like XXBTC
@@ -87,7 +89,9 @@ kraken_ledgers_prepare <- function(input) {
       dividend = any(type == "dividend"),
       receive = any(type == "receive"),
       spend = any(type == "spend"),
-      staking = any(type == "staking") | any(stringr::str_detect(asset, ".S")) | any(subtype %in% c("stakingtospot", "stakingfromspot", "spottostaking", "spotfromstaking")),
+      staking = any(type == "staking") | any(stringr::str_detect(asset, "\\.S")),
+      staking_start = any(subtype %in% c("spottostaking", "stakingfromspot", "spottofutures", "futuresfromspot")), # includes coins and futures
+      staking_end =  any(subtype %in% c("stakingtospot", "spotfromstaking", "futurestospot", "spotfromfutures")), # includes coins and futures
       trade = any(type == "trade"),
       transfer = any(type == "transfer"),
       withdrawal = any(type == "withdrawal"),
@@ -104,7 +108,7 @@ kraken_ledgers_prepare <- function(input) {
     dplyr::arrange(type, currency) %>% # create same oder in each group (currency necessary for trades)
     dplyr::mutate(
       type = dplyr::case_when(
-        type == "withdrawal" & staking == FALSE & is.na(balance) ~ "fee", # use second entry from withdrawal for fee
+        type == "withdrawal" & staking == FALSE & staking_start == FALSE & staking_end == FALSE & is.na(balance) ~ "fee", # use second entry from withdrawal for fee
         TRUE ~ type
       ),
       price = dplyr::case_when(

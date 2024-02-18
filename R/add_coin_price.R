@@ -1,6 +1,6 @@
 #' Load historic coin data
 #'
-#' @description Load all supported currencies. It uses the [kraken](https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken) cash-to-crypto pairs.
+#' @description Load all supported currencies. It uses the [kraken](https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken) cash-to-crypto pairs.Zeitraum von coin zu coin unterschiedlich. fehler erscheinen beim import in pp.
 #'
 #' @return Returns a tibble with the following columns:
 #' * `symbol` (character): currency symbol (e.g. USD, EUR...)
@@ -63,15 +63,11 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
     dplyr::mutate(date = stringr::str_remove_all(date, "-")) %>%
     dplyr::pull(date)
 
-  if (start_date == end_date) {
-    start_date <- as.character(as.numeric(start_date) - 1)
-  }
-
   # get coin history for all used coins between start end end date
   used_coins_history <- crypto2::crypto_history(
     coin_list = used_coins,
     convert = {{base_currency}},
-    start_date = start_date,
+    start_date = as.character(as.numeric(start_date) - 1),
     end_date = end_date,
     single_id = TRUE # slower, but FALSE returns error
   )
@@ -103,6 +99,7 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
       open_low = (as.numeric(open) + as.numeric(low)) / 2,
       close_high = (as.numeric(close) + as.numeric(high)) / 2,
       close_low = (as.numeric(close) + as.numeric(low)) / 2,
+      price_day_avg = (as.numeric(open) + as.numeric(close)) / 2,
       price_per_unit = dplyr::case_when(
         (diff_open <= diff_close & diff_high <= diff_low) ~ open_high, # transaction closer to open and high
         (diff_open <= diff_close & diff_high > diff_low) ~ open_low, # transaction closer to open and low
@@ -110,12 +107,14 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
         (diff_open > diff_close & diff_high > diff_low) ~ close_low # transaction closer to close and low
       ),
       price = dplyr::case_when(
-        is.na(price) & !is.na(price_per_unit) ~ price_per_unit * amount, # if entry has no price but a price per unit calculate the new prise
+        staking == TRUE & is.na(price) & !is.na(price_per_unit) ~ price_day_avg, # multiple entries for staking transactions can have very different times. so they all get the daily average
+        is.na(price) & !is.na(price_per_unit) ~ price_per_unit * amount, # if no staking entry has no price but a price per unit calculate the new price
+        #is.na(price) & !is.na(price_per_unit) & staking == TRUE ~ price_per_unit, # if staking entry has no price but a price per unit calculate the new price
         is.na(price) & currency == TRUE ~ amount, # if entry has no price but is currency (e.g. deposit) use amount as price
         TRUE ~ price
       ),
     ) %>%
-    dplyr::select(-dplyr::ends_with("open"), -dplyr::ends_with("close"), -dplyr::ends_with("high"), -dplyr::ends_with("low"), -price_per_unit)
+    dplyr::select(-dplyr::ends_with("open"), -dplyr::ends_with("close"), -dplyr::ends_with("high"), -dplyr::ends_with("low"), -price_day_avg, -price_per_unit)
 
   return(output)
 }

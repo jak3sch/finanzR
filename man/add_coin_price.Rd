@@ -15,7 +15,7 @@ Returns a tibble with the following columns:
 }
 }
 \description{
-Load all supported currencies. It uses the \href{https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken}{kraken} cash-to-crypto pairs.
+Load all supported currencies. It uses the \href{https://support.kraken.com/hc/en-us/articles/201893658-Currency-pairs-available-for-trading-on-Kraken}{kraken} cash-to-crypto pairs.Zeitraum von coin zu coin unterschiedlich. fehler erscheinen beim import in pp.
 }
 \examples{
 r <- coin_history()

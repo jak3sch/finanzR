@@ -9,23 +9,24 @@
 #'
 #' @export
 
-pp_rename_columns <- function(df, lang = "de") {
+pp_rename_columns <- function(input, lang = "de") {
     if (lang == "de") {
         col_names <- c(
             "Datum" = "date",
-            "Zeit" = "time",
+            "Uhrzeit" = "time",
             "Typ" = "type",
             "Ticker-Symbol" = "symbol",
             "Stueck" = "amount",
             "Wert" = "price",
-            "Gebuehr" = "fee",
+            "Gebuehren" = "fee",
             "Buchungswaehrung" = "currency",
             "Notiz" = "note"
         )
     }
 
-    df <- df %>%
+    output <- input %>%
+        dplyr::select(date, time, type, symbol, amount, price, fee, currency, note) %>%
         dplyr::rename(dplyr::any_of(col_names))
 
-    return(df)
+    return(output)
 }
