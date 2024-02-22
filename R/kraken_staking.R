@@ -34,7 +34,7 @@
 #' r <- kraken_staking(kraken_data, input_type = "data.frame")
 #' head(r, 10)
 
-kraken_staking <- function(input, prepared = FALSE, base_currency = "eur") {
+kraken_staking <- function(input, prepared = FALSE, transfer = FALSE, base_currency = "eur") {
   cli::cli_inform(c(i = "create staking data"))
 
   if (prepared == TRUE) {
@@ -63,46 +63,38 @@ kraken_staking <- function(input, prepared = FALSE, base_currency = "eur") {
   ## 3. deposit coin -> buy coin main account
   ## 4. transfer "spotfromstaking" -> transfer from staking to main account
 
-  main_account_transactions <- staking %>%
-    dplyr::filter(
-      staking_start == TRUE & staking == FALSE |
-        staking_end == TRUE & staking == FALSE,
-      !(type == "transfer" & staking_end == TRUE) # remove transfer coin (#3. ## 4.) because pp has the option to select an offset account on import
-    ) %>%
-    finanzR::kraken_rename_values() %>%
-    dplyr::mutate(
-      symbol = ifelse(
-        subtype == "spottostaking" & staking_start == TRUE & staking == FALSE,
-        toupper({{base_currency}}),
-        symbol
-      )
-    )
-
-  staking_account_transactions <- staking %>%
+  output <- staking %>%
     dplyr::filter(
       !(staking_start == TRUE & staking == FALSE),
-      !(type == "transfer" & staking_start == TRUE) # remove deposit coin.S (## 3.) because pp has the option to select an offset account on import
+      #!(type == "transfer" & staking_start == TRUE), # remove deposit coin.S (## 3.) because pp has the option to select an offset account on import
+      !(staking_end == TRUE & staking == FALSE)
     ) %>%
     dplyr::mutate(
       type = dplyr::case_when(
         type == "staking" & transfer == FALSE ~ "dividend",
         TRUE ~ type
       ),
-    ) %>%
+      fee = fee * price,
+      note = ifelse(subtype != "", paste(subtype, note, sep = ": "), paste("Staking:", note))
+    )
+
+  if(transfer == TRUE) {
+    output <- output %>%
+      dplyr::mutate(
+        type = dplyr::case_when(
+          type == "transfer" & staking_start == TRUE ~ "transfer_in",
+          type == "transfer" & staking_end == TRUE ~ "transfer_out",
+          TRUE ~ type
+        )
+      )
+  }
+
+  output <- output %>%
     finanzR::kraken_rename_values() %>%
     finanzR::pp_rename_columns()
 
-  write.table(staking_account_transactions, "pp_import_kraken_staking_account.csv", sep = ";", row.names = FALSE, na = "")
+  write.table(output, "pp_import_kraken_staking_account.csv", sep = ";", row.names = FALSE, na = "")
 
-  # return df if prepared == TRUE, else write csv
-  if (prepared == TRUE) {
-    return(main_account_transactions)
-  } else {
-    output <- main_account_transactions %>%
-      finanzR::pp_rename_columns()
-
-    write.table(output, "pp_import_kraken_main_account.csv", sep = ";", row.names = FALSE, na = "")
-  }
 
     # type == "deposit" & staking == TRUE & transfer == TRUE # sell coins fro staking
     # type == "transfer" & staking == TRUE & transfer == TRUE # umbuchung zu anderem konto

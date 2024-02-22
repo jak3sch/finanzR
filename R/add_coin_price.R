@@ -107,12 +107,22 @@ add_coin_price <- function(input, coins = "", base_currency = "eur") {
         (diff_open > diff_close & diff_high > diff_low) ~ close_low # transaction closer to close and low
       ),
       price = dplyr::case_when(
-        staking == TRUE & is.na(price) & !is.na(price_per_unit) ~ price_day_avg, # multiple entries for staking transactions can have very different times. so they all get the daily average
+        # multiple entries for staking transactions can have very different times. so they all get the daily average
+        staking == TRUE | staking_start == TRUE | staking_end == TRUE ~ price_day_avg * amount,
+        #staking == TRUE & staking_start == FALSE & staking_end == FALSE ~ ,
+
+        #staking == TRUE & is.na(price) & !is.na(price_per_unit) ~ price_day_avg * amount,
         is.na(price) & !is.na(price_per_unit) ~ price_per_unit * amount, # if no staking entry has no price but a price per unit calculate the new price
         #is.na(price) & !is.na(price_per_unit) & staking == TRUE ~ price_per_unit, # if staking entry has no price but a price per unit calculate the new price
         is.na(price) & currency == TRUE ~ amount, # if entry has no price but is currency (e.g. deposit) use amount as price
         TRUE ~ price
       ),
+
+      # symbol fixes for pp import
+      symbol = dplyr::case_when(
+        symbol %in% c("LUNC", "LUNA") ~ asset,
+        TRUE ~ symbol
+      )
     ) %>%
     dplyr::select(-dplyr::ends_with("open"), -dplyr::ends_with("close"), -dplyr::ends_with("high"), -dplyr::ends_with("low"), -price_day_avg, -price_per_unit)
 

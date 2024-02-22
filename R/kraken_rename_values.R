@@ -35,6 +35,7 @@ kraken_rename_values <- function(input, provider = "kraken", lang = "de", base_c
     lang_sell <- "Verkauf"
     lang_withdrawal <- "Entnahme"
     lang_fee <- "Gebühren"
+    lang_transfer_in <- "Umbuchung (Eingang)"
     lang_transfer_out <- "Umbuchung (Ausgang)"
     lang_dividend <- "Dividende"
   }
@@ -51,12 +52,15 @@ kraken_rename_values <- function(input, provider = "kraken", lang = "de", base_c
         type == "trade" & amount < 0 ~ lang_sell, # trade coin
         type == "trade" & amount > 0 ~ lang_buy, # trade coin
         type == "fee" ~ lang_fee,
-        type == "transfer" & staking_start == TRUE ~ lang_transfer_out,
-        type == "transfer" & staking_end == TRUE ~ lang_transfer_out,
+        type == "transfer" & staking_start == TRUE ~ lang_deposit,
+        type == "transfer" & staking_end == TRUE ~ lang_withdrawal,
         type == "deposit" & staking_start == TRUE ~ lang_buy,
         type == "deposit" & staking_end == TRUE ~ lang_buy,
-        type == "deposit" & transfer == FALSE ~ lang_buy,
+        #type == "deposit" & transfer == FALSE ~ lang_buy,
+        type == "deposit" ~ lang_buy,
         type == "dividend" ~ lang_dividend,
+        type == "transfer_in" ~ lang_transfer_in,
+        type == "transfer_out" ~ lang_transfer_out,
         TRUE ~ type
       ),
       # final fixes

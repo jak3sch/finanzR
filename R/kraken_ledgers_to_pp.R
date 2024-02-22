@@ -10,7 +10,7 @@
 #' r <- all_currencies()
 #' r
 
-kraken_ledgers_to_pp <- function(input, base_currency = "eur", lang = "de", filter = FALSE) {
+kraken_ledgers_to_pp <- function(input, base_currency = "eur", lang = "de", filter = FALSE, transfer = FALSE) {
   if (is.character(input)) {
     input_data <- utils::read.csv(input)
   } else {
@@ -19,7 +19,7 @@ kraken_ledgers_to_pp <- function(input, base_currency = "eur", lang = "de", filt
 
   # TODO: if filter is set, filter for transaction types
 
-  prepare <- finanzR::kraken_ledgers_prepare(input = ledgers)
+  prepare <- finanzR::kraken_ledgers_prepare(input = input_data)
 
   # load all coins
   all_coins <- crypto2::crypto_list(only_active = FALSE)
@@ -27,14 +27,13 @@ kraken_ledgers_to_pp <- function(input, base_currency = "eur", lang = "de", filt
   # only needed for staking
   coin_history <- finanzR::add_coin_price(input = prepare, coins = all_coins, base_currency = {{base_currency}})
 
-  staking <- finanzR::kraken_staking(coin_history, prepared = TRUE, base_currency = {{base_currency}})
+  staking <- finanzR::kraken_staking(coin_history, prepared = TRUE, transfer = {{transfer}}, base_currency = {{base_currency}})
 
   cli::cli_inform(c(i = "create import file"))
 
   output <- coin_history %>%
     dplyr::filter(staking == FALSE & staking_start == FALSE & staking_end == FALSE) %>% # remove all staking transactions
     finanzR::kraken_rename_values() %>%
-    rbind(staking) %>%
     dplyr::arrange(timestamp) %>%
     finanzR::pp_rename_columns()
 

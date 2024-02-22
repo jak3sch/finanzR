@@ -76,8 +76,8 @@ kraken_ledgers_prepare <- function(input) {
       symbol = dplyr::case_when(
         symbol == "XBT" ~ "BTC",
         symbol == "XDG" ~ "DOGE",
-        symbol == "LUNA" ~ "LUNC",
-        symbol == "LUNA2" ~ "LUNA",
+        symbol == "LUNA" ~ "LUNC", # needed for sync with crypto2 package
+        symbol == "LUNA2" ~ "LUNA", # needed for sync with crypto2 package
         TRUE ~ symbol
       )
     ) %>%
@@ -90,8 +90,8 @@ kraken_ledgers_prepare <- function(input) {
       receive = any(type == "receive"),
       spend = any(type == "spend"),
       staking = any(type == "staking") | any(stringr::str_detect(asset, "\\.S")),
-      staking_start = any(subtype %in% c("spottostaking", "stakingfromspot", "spottofutures", "futuresfromspot")), # includes coins and futures
-      staking_end =  any(subtype %in% c("stakingtospot", "spotfromstaking", "futurestospot", "spotfromfutures")), # includes coins and futures
+      staking_start = any(subtype %in% c("spottostaking", "stakingfromspot")), # includes coins and futures
+      staking_end =  any(subtype %in% c("stakingtospot", "spotfromstaking")), # includes coins and futures
       trade = any(type == "trade"),
       transfer = any(type == "transfer"),
       withdrawal = any(type == "withdrawal"),
@@ -105,9 +105,11 @@ kraken_ledgers_prepare <- function(input) {
 
     # handle multiple entries per transaction
     dplyr::group_by(refid) %>%
-    dplyr::arrange(type, currency) %>% # create same oder in each group (currency necessary for trades)
+    dplyr::arrange(type, currency, balance) %>% # create same oder in each group (currency necessary for trades), balance from multiple transactions needs to be in 1st row
     dplyr::mutate(
+      group_row = dplyr::row_number(),
       type = dplyr::case_when(
+        type == "trade" & amount < 0 ~ "spend",
         type == "withdrawal" & staking == FALSE & staking_start == FALSE & staking_end == FALSE & is.na(balance) ~ "fee", # use second entry from withdrawal for fee
         TRUE ~ type
       ),
@@ -136,6 +138,9 @@ kraken_ledgers_prepare <- function(input) {
       !(type == "spend" & currency == TRUE & is.na(price)), # remove spend transactions from coin buys
       !(type == "receive" & currency == TRUE & is.na(price)), # remove receive transaction from coin sells
       !(type == "trade" & staking == FALSE & currency == TRUE), # remove duplicates from coin trades
+      !(type == "transfer" & subtype %in% c("spotfromfutures", "futuresfromspot", "futurestospot", "spottofutures")), # remove all futures transfers
+      !(type == "fee" & currency == FALSE & withdrawal == TRUE), # remove seperate fee transactions from coin withdrawal
+      !(type == "deposit" & staking == FALSE & is.na(balance) & group_row != 1), # remove duplicate rows from deposits
     ) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(timestamp) %>%
